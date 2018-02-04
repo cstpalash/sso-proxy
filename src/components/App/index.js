@@ -1,7 +1,25 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import authAction from '../../redux/App/actions';
 import './style.css';
+import qs from 'qs';
+
+const { login, loginSuccess } = authAction;
 
 class App extends Component {
+
+  componentDidMount(){
+
+  	const hashData = qs.parse(window.location.hash);
+
+  	if(hashData['#id_token'] && hashData['access_token']){
+  		this.props.loginSuccess(hashData['#id_token'], hashData['access_token']);
+  	}
+  	else{
+  		this.props.login();
+  	}
+  }	
+
   render() {
     return (
       <div className="App">
@@ -13,4 +31,9 @@ class App extends Component {
   }
 }
 
-export default App;
+export default connect(
+  state => ({
+    isLoggedIn: state.App.get('idToken') !== null ? true : false,
+  }),
+  { login, loginSuccess }
+)(App);
